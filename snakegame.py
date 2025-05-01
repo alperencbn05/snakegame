@@ -1,29 +1,26 @@
-
 from tkinter import *
 import random
 
-# ayarlar
-kare_boyutu = 20
-genislik = 400
-yukseklik = 400
-yem_boyutu = 10
-skor = 0
+# Constants
+SQUARE_SIZE = 20
+WIDTH = 400
+HEIGHT = 400
+FOOD_SIZE = 10
+GAME_SPEED = 200  # milliseconds
 
-# baslangic
-pencere = Tk()
-canvas = Canvas(pencere , width=genislik, height=yukseklik)
+# Game state
+score = 0
+snake = [[60, 100], [40, 100], [20, 100]]
+direction = "Right"
+food = [random.choice(range(0, WIDTH, SQUARE_SIZE)), 
+        random.choice(range(0, HEIGHT, SQUARE_SIZE))]
+
+# Initialize window
+window = Tk()
+canvas = Canvas(window, width=WIDTH, height=HEIGHT)
 canvas.pack()
 
-# yilanin baslangic konumu
-yilan = [[60 , 100], [40, 100], [20 , 100]]
-direction = "Right"
-
-# yemin baslangic konumu
-yem = [random.choice(range(0, 400, 20)), random.choice(range(0, 400, 20))]
-
-
-
-def yon_degistir(event):
+def change_direction(event):
     global direction
     if event.keysym == "Up" and direction != "Down":
         direction = "Up"
@@ -32,126 +29,106 @@ def yon_degistir(event):
     elif event.keysym == "Left" and direction != "Right":
         direction = "Left"
     elif event.keysym == "Right" and direction != "Left":
-        direction = "Right" 
+        direction = "Right"
 
-def hareket_et():
-    global yem
-    global yilan
-    global direction
-    global skor
+def move():
+    global food, snake, direction, score
 
-
-    # mevcut kafa kordinatlari
-    x, y = yilan[0]
+    # Get current head position
+    x, y = snake[0]
+    
+    # Calculate new head position
     if direction == "Up":
-        y -= kare_boyutu
+        y -= SQUARE_SIZE
     elif direction == "Down":
-        y += kare_boyutu
+        y += SQUARE_SIZE
     elif direction == "Left":
-        x -= kare_boyutu
+        x -= SQUARE_SIZE
     elif direction == "Right":
-        x += kare_boyutu
+        x += SQUARE_SIZE
 
+    # Update snake
+    new_head = [x, y]
+    snake.insert(0, new_head)
+    snake.pop()
 
-    yeni_kafa = [x, y]
-    yilan.insert(0, yeni_kafa)  # yilanin basina yeni kafa ekle
-    yilan.pop()  # yilanin sonundan bir parca sil
+    # Clear canvas
+    canvas.delete("all")
 
-    
+    # Draw snake
+    for part_x, part_y in snake:
+        canvas.create_rectangle(part_x, part_y, 
+                              part_x + SQUARE_SIZE, 
+                              part_y + SQUARE_SIZE, 
+                              fill="green")
 
-    canvas.delete("all")  # canvasi temizle
+    # Draw food
+    canvas.create_rectangle(food[0], food[1], 
+                          food[0] + FOOD_SIZE, 
+                          food[1] + FOOD_SIZE, 
+                          fill="red")
 
-    for parcax , parcay in yilan:
-        canvas.create_rectangle(parcax, parcay, parcax + kare_boyutu, parcay + kare_boyutu, fill="green")
-    
+    # Check if food is eaten
+    if snake[0] == food:
+        score += 1
+        snake.append(snake[-1])  # Add new segment
+        food = [random.choice(range(0, WIDTH, SQUARE_SIZE)),
+                random.choice(range(0, HEIGHT, SQUARE_SIZE))]
 
-    
-    canvas.create_rectangle(yem[0], yem[1], yem[0] + yem_boyutu, yem[1] + yem_boyutu, fill="red")
-    if yilan[0] == yem:
-        skor += 1
-        yilan.append(yilan[-1])  # yilanin sonuna bir parca ekle
-        x = random.choice(range(0, 400, 20))
-        y = random.choice(range(0, 400, 20))
-        yem = [x, y]
-        canvas.create_rectangle(yem[0], yem[1], yem[0] + yem_boyutu, yem[1] + yem_boyutu, fill="red")
+    # Draw score
+    canvas.create_text(50, 10, text=f"Score: {score}", 
+                      font=("Arial", 12), fill="black")
 
-    canvas.create_text(50, 10, text="Skor: " + str(skor), font=("Arial", 12), fill="black")
-
-    if oyun_bitti():
+    if game_over():
         return
-    canvas.after(200, hareket_et)
+    canvas.after(GAME_SPEED, move)
 
-
-def oyunu_yeniden_baslat():
-    global yilan
-    global yem
-    global skor
-    global direction
-    global btn
+def restart_game():
+    global snake, food, score, direction, btn, final_score
     try: 
         btn.destroy()
     except:
         pass
     try:
-        sonskor.destroy()
+        final_score.destroy()
     except:
         pass
-    
 
-    yilan = [[60 , 100], [40, 100], [20 , 100]]
+    snake = [[60, 100], [40, 100], [20, 100]]
     direction = "Right"
-    yem = [random.choice(range(0, 400, 20)), random.choice(range(0, 400, 20))]
-    skor = 0
-    direction = "Right"
+    food = [random.choice(range(0, WIDTH, SQUARE_SIZE)),
+            random.choice(range(0, HEIGHT, SQUARE_SIZE))]
+    score = 0
     canvas.delete("all")
-    hareket_et()
+    move()
 
-def oyun_bitti():
-    global yilan
-    global btn
-    global sonskor
-    global skor
-    
+def game_over():
+    global snake, btn, final_score, score
 
-    if yilan[0][0] < 0 or yilan[0][0] >=  genislik or yilan[0][1] < 0 or yilan[0][1] >= yukseklik:
-        canvas.delete("all")
-        canvas.create_text(genislik // 2, yukseklik // 2, text="Oyun Bitti!", font=("Arial", 24), fill="red")
-
-        btn = Button(pencere, text="Yeniden Başla", command=oyunu_yeniden_baslat)
-        canvas.create_window(genislik//2, yukseklik//2 + 40, window=btn)
-
-        sonskor = Label(pencere, text="Skor: " + str(skor), font=("Arial", 12))
-        canvas.create_window(genislik//2, yukseklik//2 + 70, window=sonskor , anchor="center")
+    # Check wall collision
+    if (snake[0][0] < 0 or snake[0][0] >= WIDTH or 
+        snake[0][1] < 0 or snake[0][1] >= HEIGHT or
+        snake[0] in snake[1:]):  # Check self collision
         
+        canvas.delete("all")
+        canvas.create_text(WIDTH // 2, HEIGHT // 2, 
+                          text="Game Over!", 
+                          font=("Arial", 24), fill="red")
 
+        btn = Button(window, text="Restart", 
+                    command=restart_game)
+        canvas.create_window(WIDTH//2, HEIGHT//2 + 40, 
+                           window=btn)
 
-
-
+        final_score = Label(window, text=f"Score: {score}", 
+                           font=("Arial", 12))
+        canvas.create_window(WIDTH//2, HEIGHT//2 + 70, 
+                           window=final_score, anchor="center")
         return True
     
-    
-    elif yilan[0] in yilan[1:]:
-        canvas.delete("all")
-        canvas.create_text(genislik // 2, yukseklik // 2, text="Oyun Bitti!", font=("Arial", 24), fill="red")
-    
-        btn = Button(pencere, text="Yeniden Başla", command=oyunu_yeniden_baslat)
-        canvas.create_window(genislik//2, yukseklik//2 + 40, window=btn)
+    return False
 
-        sonskor = Label(pencere, text="Skor: " + str(skor), font=("Arial", 12))
-        canvas.create_window(genislik//2, yukseklik//2 + 70, window=sonskor , anchor="center")
-        
-        
-
-        return True
-    
-    else:
-        return False
-
-
-
-
-
-    
-pencere.bind("<KeyPress>" , yon_degistir)
-hareket_et()
-pencere.mainloop()
+# Start game
+window.bind("<KeyPress>", change_direction)
+move()
+window.mainloop()
