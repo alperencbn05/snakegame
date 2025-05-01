@@ -1,49 +1,49 @@
 # Python Snake Game
 
-Bu proje, Python ve Tkinter kullanılarak geliştirilmiş basit bir yılan oyunudur.
+This project is a simple snake game developed using Python and Tkinter.
 
-## Özellikler
+## Features
 
-- Klasik yılan oyunu mekanikleri
-- Skor takibi
-- Yeniden başlatma özelliği
-- Basit ve kullanıcı dostu arayüz
+- Classic snake game mechanics
+- Score tracking
+- Restart functionality
+- Simple and user-friendly interface
 
-## Gereksinimler
+## Requirements
 
 - Python 3.x
-- Tkinter (Python ile birlikte gelir)
+- Tkinter (comes with Python)
 
-## Kurulum
+## Installation
 
-1. Projeyi klonlayın:
+1. Clone the repository:
 ```bash
-git clone https://github.com/[kullanıcı-adınız]/snakegame.git
+git clone https://github.com/alperencbn05/snakegame.git
 ```
 
-2. Proje dizinine gidin:
+2. Navigate to the project directory:
 ```bash
 cd snakegame
 ```
 
-3. Oyunu çalıştırın:
+3. Run the game:
 ```bash
 python snakegame.py
 ```
 
-## Oyun Kontrolleri
+## Game Controls
 
-- ↑ : Yukarı
-- ↓ : Aşağı
-- ← : Sol
-- → : Sağ
+- ↑ : Up
+- ↓ : Down
+- ← : Left
+- → : Right
 
-## Oyun Kuralları
+## Game Rules
 
-- Yılanı yön tuşlarıyla kontrol edin
-- Kırmızı yemleri yiyerek puan kazanın
-- Duvarlara veya kendi vücudunuza çarpmamaya dikkat edin
+- Control the snake using arrow keys
+- Eat red food to gain points
+- Avoid hitting the walls or your own body
 
-## Lisans
+## License
 
-Bu proje MIT lisansı altında lisanslanmıştır. 
+This project is licensed under the MIT License. 
