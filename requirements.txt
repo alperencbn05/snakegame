@@ -1,0 +1,2 @@
+# Python requirements
+# Tkinter comes with Python installation, no need for additional packages 
